@@ -40,12 +40,11 @@ const H3 = styled.h3`
 
 function MainHeader(props) {
   const settings = useContext(SettingsContext);
-
   const handleNumberChange = (e) => {
-    settings.setShowNumber(parseInt(e.target.value));
+    settings.editShowNumber(parseInt(e.target.value));
   };
   const handleShowChange = (e) => {
-    settings.setShowCompleted(e.target.checked);
+    settings.editHideCompleted(e.target.checked);
   };
   return (
     <>
@@ -57,15 +56,19 @@ function MainHeader(props) {
           <input
             type="number"
             onChange={handleNumberChange}
-            max="4"
-            min="2"
+            max="3"
+            min="1"
             step="1"
-            value="2"
+            defaultValue={settings.showNumber}
           />
         </Nav>
         <Nav>
           Hide Complete
-          <input type="checkbox" onChange={handleShowChange} />
+          <input
+            type="checkbox"
+            onChange={handleShowChange}
+            checked={settings.hideCompleted ? "checked" : ""}
+          />
         </Nav>
       </Navbar>
     </>
