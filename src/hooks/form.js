@@ -15,7 +15,6 @@ const useForm = (callback) => {
       [event.target.name]: event.target.value,
     }));
   };
-
   return {
     handleChange,
     handleSubmit,

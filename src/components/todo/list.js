@@ -44,11 +44,34 @@ const Index = styled.div`
 
 function List(props) {
   const settings = useContext(SettingsContext);
-  const [data, setData] = useState([...props.dataList]);
-  console.log(data);
+  const [data, setData] = useState([]);
+  const [completed, setCompleted] = useState([]);
+  useEffect(() => {
+    console.log(props.dataList);
+    let filtered = props.dataList.filter((ele) => {
+      if (settings.hideCompleted) {
+        return ele.complete === false;
+      } else {
+        return true;
+      }
+    });
+    setCompleted(filtered);
+  }, [settings.hideCompleted, props.dataList]);
+  useEffect(() => {
+    if (completed.length <= settings.showNumber) {
+      setData([...completed]);
+    } else {
+      let raw = ["", ...completed];
+      let renderedData = [];
+      for (let i = 1; i <= settings.showNumber; i++) {
+        renderedData.push(raw[i]);
+      }
+      setData([...renderedData]);
+    }
+  }, [settings.showNumber, completed]);
   let paginationIndex = Math.floor(props.dataList.length / settings.showNumber);
   const handlePagination = (e) => {
-    let raw = ["", ...props.dataList];
+    let raw = ["", ...completed];
     let page = parseInt(e.target.innerHTML);
     let renderedData = [];
     for (let i = 1; i <= settings.showNumber * page; i++) {
@@ -61,27 +84,32 @@ function List(props) {
     }
     setData(renderedData);
   };
-
-  let rendered = data.map((item) => (
-    <WideCard key={item.id}>
-      <p>{item.text}</p>
-      <p>
-        <small>Assigned to: {item.assignee}</small>
-      </p>
-      <p>
-        <small>Difficulty: {item.difficulty}</small>
-      </p>
-      <div onClick={() => props.toggleComplete(item.id)}>
-        Complete: {item.complete.toString()}
-      </div>
-    </WideCard>
-  ));
+  let rendered =
+    data.length > 0 ? (
+      data.map((item, idx) => (
+        <WideCard key={idx}>
+          <p>{item.text}</p>
+          <p>
+            <small>Assigned to: {item.assignee}</small>
+          </p>
+          <p>
+            <small>Difficulty: {item.difficulty}</small>
+          </p>
+          <div onClick={() => props.toggleComplete(item.id)}>
+            Complete: {item.complete.toString()}
+          </div>
+        </WideCard>
+      ))
+    ) : (
+      <p>no data</p>
+    );
   let indices = Array.from({ length: paginationIndex }, (_, i) => i + 1).map(
     (ele) => <Index onClick={handlePagination}>{ele}</Index>
   );
+
   return (
     <Main>
-      <div>{rendered ? rendered : <p>no data</p>}</div>
+      <div>{rendered}</div>
       <IndexList>{indices}</IndexList>
     </Main>
   );

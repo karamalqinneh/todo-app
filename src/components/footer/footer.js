@@ -11,7 +11,7 @@ const Main = styled.footer`
 `;
 
 function Footer() {
-  return <Main>Project by Karam Al-Qinneh</Main>;
+  return <Main>Project by Karam Al-Qinneh &copy; </Main>;
 }
 
 export default Footer;
