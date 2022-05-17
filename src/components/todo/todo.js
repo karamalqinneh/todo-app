@@ -1,20 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import useForm from "../../hooks/form";
-
+import Card from "../../UI/card";
+import styled from "styled-components";
+import { SettingsContext } from "../../context/settings/context";
 import { v4 as uuid } from "uuid";
+import List from "./list";
+
+const Section = styled.section`
+  display: flex;
+  width: 100vw;
+  height: 80vh;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+const StyledCard = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30vw;
+  height: 65vh;
+`;
 
 const ToDo = () => {
   const [list, setList] = useState([]);
   const [incomplete, setIncomplete] = useState([]);
   const { handleChange, handleSubmit } = useForm(addItem);
-
+  const settings = useContext(SettingsContext);
   function addItem(item) {
-    console.log(item);
     item.id = uuid();
     item.complete = false;
     setList([...list, item]);
   }
-
+  useEffect(() => {
+    let filtered = list.filter(
+      (item) => item.complete == settings.showCompleted
+    );
+    setList(filtered);
+  }, [settings.showCompleted]);
   function deleteItem(id) {
     const items = list.filter((item) => item.id !== id);
     setList(items);
@@ -36,69 +59,55 @@ const ToDo = () => {
     setIncomplete(incompleteCount);
     document.title = `To Do List: ${incomplete}`;
   }, [list]);
-
   return (
-    <>
-      <header>
-        <h1>To Do List: {incomplete} items pending</h1>
-      </header>
+    <Section>
+      <StyledCard>
+        <header>
+          <h1>To Do List: {incomplete} items pending</h1>
+        </header>
 
-      <form onSubmit={handleSubmit}>
-        <h2>Add To Do Item</h2>
+        <form onSubmit={handleSubmit}>
+          <h2>Add To Do Item</h2>
 
-        <label>
-          <span>To Do Item</span>
-          <input
-            onChange={handleChange}
-            name="text"
-            type="text"
-            placeholder="Item Details"
-          />
-        </label>
+          <label>
+            <div>To Do Item</div>
+            <input
+              onChange={handleChange}
+              name="text"
+              type="text"
+              placeholder="Item Details"
+            />
+          </label>
 
-        <label>
-          <span>Assigned To</span>
-          <input
-            onChange={handleChange}
-            name="assignee"
-            type="text"
-            placeholder="Assignee Name"
-          />
-        </label>
+          <label>
+            <div>Assigned To</div>
+            <input
+              onChange={handleChange}
+              name="assignee"
+              type="text"
+              placeholder="Assignee Name"
+            />
+          </label>
 
-        <label>
-          <span>Difficulty</span>
-          <input
-            onChange={handleChange}
-            defaultValue={3}
-            type="range"
-            min={1}
-            max={5}
-            name="difficulty"
-          />
-        </label>
+          <label>
+            <div>Difficulty</div>
+            <input
+              onChange={handleChange}
+              defaultValue={3}
+              type="range"
+              min={1}
+              max={5}
+              name="difficulty"
+            />
+          </label>
 
-        <label>
-          <button type="submit">Add Item</button>
-        </label>
-      </form>
-
-      {list.map((item) => (
-        <div key={item.id}>
-          <p>{item.text}</p>
-          <p>
-            <small>Assigned to: {item.assignee}</small>
-          </p>
-          <p>
-            <small>Difficulty: {item.difficulty}</small>
-          </p>
-          <div onClick={() => toggleComplete(item.id)}>
-            Complete: {item.complete.toString()}
+          <div>
+            <button type="submit">Add Item</button>
           </div>
-          <hr />
-        </div>
-      ))}
-    </>
+        </form>
+      </StyledCard>
+      <List dataList={list} toggleComplete={toggleComplete} />
+    </Section>
   );
 };
 
