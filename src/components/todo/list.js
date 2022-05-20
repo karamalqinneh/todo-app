@@ -12,8 +12,7 @@ const Main = styled.div`
 
 const WideCard = styled(Card)`
   width: 40vw;
-  height: 20vh;
-  margin-bottom: 1vh;
+  margin-bottom: 0.5vh;
   display: flex;
   flex-direction: column;
 `;
@@ -42,12 +41,15 @@ const Index = styled.div`
   cursor: pointer;
 `;
 
+const P = styled.p`
+  margin-bottom: 2px;
+`;
+
 function List(props) {
   const settings = useContext(SettingsContext);
   const [data, setData] = useState([]);
   const [completed, setCompleted] = useState([]);
   useEffect(() => {
-    console.log(props.dataList);
     let filtered = props.dataList.filter((ele) => {
       if (settings.hideCompleted) {
         return ele.complete === false;
@@ -88,20 +90,20 @@ function List(props) {
     data.length > 0 ? (
       data.map((item, idx) => (
         <WideCard key={idx}>
-          <p>{item.text}</p>
-          <p>
+          <P>{item.text}</P>
+          <P>
             <small>Assigned to: {item.assignee}</small>
-          </p>
-          <p>
+          </P>
+          <P>
             <small>Difficulty: {item.difficulty}</small>
-          </p>
+          </P>
           <div onClick={() => props.toggleComplete(item.id)}>
             Complete: {item.complete.toString()}
           </div>
         </WideCard>
       ))
     ) : (
-      <p>no data</p>
+      <P>no data</P>
     );
   let indices = Array.from({ length: paginationIndex }, (_, i) => i + 1).map(
     (ele) => <Index onClick={handlePagination}>{ele}</Index>

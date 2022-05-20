@@ -3,6 +3,7 @@ import useForm from "../../hooks/form";
 import Card from "../../UI/card";
 import styled from "styled-components";
 import { SettingsContext } from "../../context/settings/context";
+import { LoginContext } from "../../context/auth/login";
 import { v4 as uuid } from "uuid";
 import List from "./list";
 
@@ -27,6 +28,7 @@ const ToDo = () => {
   const [incomplete, setIncomplete] = useState([]);
   const { handleChange, handleSubmit } = useForm(addItem);
   const settings = useContext(SettingsContext);
+  const login = useContext(LoginContext);
   function addItem(item) {
     item.id = uuid();
     item.complete = false;
@@ -44,14 +46,18 @@ const ToDo = () => {
   }
 
   function toggleComplete(id) {
-    const items = list.map((item) => {
-      if (item.id == id) {
-        item.complete = !item.complete;
-      }
-      return item;
-    });
-
-    setList(items);
+    if (login.canDo("update")) {
+      const items = list.map((item) => {
+        if (item.id == id) {
+          item.complete = !item.complete;
+        }
+        return item;
+      });
+      console.log("can");
+      setList(items);
+    } else {
+      console.log("Can't");
+    }
   }
 
   useEffect(() => {
@@ -102,7 +108,11 @@ const ToDo = () => {
           </label>
 
           <div>
-            <button type="submit">Add Item</button>
+            {login.canDo("create") ? (
+              <button type="submit">Add Item</button>
+            ) : (
+              <p>You cant post a new todo</p>
+            )}
           </div>
         </form>
       </StyledCard>
