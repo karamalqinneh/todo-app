@@ -71,7 +71,13 @@ function FormModal(props) {
         <Modal.Title id="contained-modal-title-vcenter">Sign In</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <StyledForm className={props.className} onSubmit={handleSubmit}>
+        <StyledForm
+          className={props.className}
+          onSubmit={(e) => {
+            handleSubmit(e);
+            props.onHide();
+          }}
+        >
           <Input
             type="text"
             placeholder="Username"

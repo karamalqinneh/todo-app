@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import { SettingsContext } from "../../context/settings/context";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import FormModal from "../login-form/formModal";
 import { Button } from "react-bootstrap";
 import { LoginContext } from "../../context/auth/login";

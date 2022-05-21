@@ -1,7 +1,7 @@
 import Card from "../../UI/card";
 import styled from "styled-components";
 import { SettingsContext } from "../../context/settings/context";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 
 const Main = styled.div`
   display: flex;
@@ -40,6 +40,9 @@ const Index = styled.div`
   background: #fdfdfd;
   border: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  &.active {
+    background: #b5b3b3;
+  }
 `;
 
 const P = styled.p`
@@ -56,9 +59,15 @@ const Delete = styled.div`
 `;
 
 function List(props) {
+  const indexRef = useRef();
   const settings = useContext(SettingsContext);
   const [data, setData] = useState([]);
   const [completed, setCompleted] = useState([]);
+  const classesHandler = (e) => {
+    const children = [].slice.call(indexRef.current.children);
+    children.forEach((ele) => ele.classList.remove("active"));
+    e.target.classList.add("active");
+  };
   useEffect(() => {
     let filtered = props.dataList.filter((ele) => {
       if (settings.hideCompleted) {
@@ -121,13 +130,24 @@ function List(props) {
     ? Math.floor(props.dataList.length / settings.showNumber)
     : Math.floor(completed.length / settings.showNumber);
   let indices = Array.from({ length: paginationIndex }, (_, i) => i + 1).map(
-    (ele) => <Index onClick={handlePagination}>{ele}</Index>
+    (ele, idx) => {
+      if (idx === 0) {
+        return (
+          <Index className={"active"} onClick={handlePagination}>
+            {ele}
+          </Index>
+        );
+      }
+      return <Index onClick={handlePagination}>{ele}</Index>;
+    }
   );
 
   return (
     <Main>
       <div>{rendered}</div>
-      <IndexList>{indices}</IndexList>
+      <IndexList ref={indexRef} onClick={classesHandler}>
+        {indices}
+      </IndexList>
     </Main>
   );
 }
