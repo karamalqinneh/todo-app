@@ -11,10 +11,11 @@ const Main = styled.div`
 `;
 
 const WideCard = styled(Card)`
-  width: 40vw;
+  width: 20vw;
   margin-bottom: 0.5vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 const IndexList = styled.div`
@@ -45,6 +46,15 @@ const P = styled.p`
   margin-bottom: 2px;
 `;
 
+const Delete = styled.div`
+  color: red;
+  cursor: pointer;
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  font-size: 1.3rem;
+`;
+
 function List(props) {
   const settings = useContext(SettingsContext);
   const [data, setData] = useState([]);
@@ -71,7 +81,6 @@ function List(props) {
       setData([...renderedData]);
     }
   }, [settings.showNumber, completed]);
-  let paginationIndex = Math.floor(props.dataList.length / settings.showNumber);
   const handlePagination = (e) => {
     let raw = ["", ...completed];
     let page = parseInt(e.target.innerHTML);
@@ -88,23 +97,29 @@ function List(props) {
   };
   let rendered =
     data.length > 0 ? (
-      data.map((item, idx) => (
-        <WideCard key={idx}>
-          <P>{item.text}</P>
-          <P>
-            <small>Assigned to: {item.assignee}</small>
-          </P>
-          <P>
-            <small>Difficulty: {item.difficulty}</small>
-          </P>
-          <div onClick={() => props.toggleComplete(item.id)}>
-            Complete: {item.complete.toString()}
-          </div>
-        </WideCard>
-      ))
+      data.map((item, idx) => {
+        return (
+          <WideCard key={item.id}>
+            <P>{item.text}</P>
+            <P>
+              <small>Assigned to: {item.assignee}</small>
+            </P>
+            <P>
+              <small>Difficulty: {item.difficulty}</small>
+            </P>
+            <div onClick={() => props.toggleComplete(item.id)}>
+              Complete: {item.complete.toString()}
+            </div>
+            <Delete onClick={() => props.deleteItem(item.id)}>X</Delete>
+          </WideCard>
+        );
+      })
     ) : (
       <P>no data</P>
     );
+  let paginationIndex = !settings.hideCompleted
+    ? Math.floor(props.dataList.length / settings.showNumber)
+    : Math.floor(completed.length / settings.showNumber);
   let indices = Array.from({ length: paginationIndex }, (_, i) => i + 1).map(
     (ele) => <Index onClick={handlePagination}>{ele}</Index>
   );

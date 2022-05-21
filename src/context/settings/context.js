@@ -24,11 +24,9 @@ export default function SettingsProvider(props) {
     localStorage.setItem("userSettings", JSON.stringify(originalUserSettings));
   };
   const editShowNumber = (value) => {
-    console.log(showNumber, "Before");
     originalUserSettings["showNumber"] = value;
     localStorage.setItem("userSettings", JSON.stringify(originalUserSettings));
     setShowNumber(originalUserSettings.showNumber);
-    console.log(showNumber, "After");
   };
   const state = {
     hideCompleted,

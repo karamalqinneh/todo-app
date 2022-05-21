@@ -4,8 +4,10 @@ import Card from "../../UI/card";
 import styled from "styled-components";
 import { SettingsContext } from "../../context/settings/context";
 import { LoginContext } from "../../context/auth/login";
-import { v4 as uuid } from "uuid";
 import List from "./list";
+import superagent from "superagent";
+
+const API = `https://todo-auth-api.herokuapp.com`;
 
 const Section = styled.section`
   display: flex;
@@ -29,23 +31,42 @@ const ToDo = () => {
   const { handleChange, handleSubmit } = useForm(addItem);
   const settings = useContext(SettingsContext);
   const login = useContext(LoginContext);
-  function addItem(item) {
-    item.id = uuid();
-    item.complete = false;
-    setList([...list, item]);
-  }
+  useEffect(() => {
+    const getAPIData = async () => {
+      let response = await superagent.get(
+        "https://todo-auth-api.herokuapp.com/todo"
+      );
+
+      let body = await response.body;
+      body.sort((a, b) => {
+        let x = a["id"];
+        let y = b["id"];
+        return x < y ? -1 : x > y ? 1 : 0;
+      });
+      setList(body);
+    };
+    getAPIData();
+  }, []);
   useEffect(() => {
     let filtered = list.filter(
       (item) => item.complete == settings.showCompleted
     );
     setList(filtered);
   }, [settings.showCompleted]);
-  function deleteItem(id) {
+  async function addItem(item) {
+    item.complete = false;
+    let newItem = { ...item, username: login.user.username };
+    console.log(newItem);
+    let req = await superagent.post(`${API}/add-todo`).send(newItem);
+    setList([...list, item]);
+  }
+  async function deleteItem(id) {
     const items = list.filter((item) => item.id !== id);
+    let req = await superagent.put(`${API}/delete-todo/${id}`);
     setList(items);
   }
 
-  function toggleComplete(id) {
+  async function toggleComplete(id) {
     if (login.canDo("update")) {
       const items = list.map((item) => {
         if (item.id == id) {
@@ -53,7 +74,8 @@ const ToDo = () => {
         }
         return item;
       });
-      console.log("can");
+      let req = await superagent.put(`${API}/update-todo/${id}`);
+      console.log(req);
       setList(items);
     } else {
       console.log("Can't");
@@ -116,7 +138,11 @@ const ToDo = () => {
           </div>
         </form>
       </StyledCard>
-      <List dataList={list} toggleComplete={toggleComplete} />
+      <List
+        dataList={list}
+        toggleComplete={toggleComplete}
+        deleteItem={deleteItem}
+      />
     </Section>
   );
 };
