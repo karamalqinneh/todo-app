@@ -1,6 +1,9 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { SettingsContext } from "../../context/settings/context";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
+import FormModal from "../login-form/formModal";
+import { Button } from "react-bootstrap";
+import { LoginContext } from "../../context/auth/login";
 
 const Navbar = styled.nav`
   color: #09c8c3;
@@ -38,7 +41,46 @@ const H3 = styled.h3`
   color: #fefefe;
 `;
 
+const fill = keyframes`
+0%{
+  background-color: rgb(9, 200, 195);
+}
+100% {
+  background-color: #fefefe;
+  color: rgb(9, 200, 195);
+
+}
+`;
+
+const StyledButton = styled(Button)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-appearance: button;
+  -moz-appearance: button;
+  appearance: button;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fefefe;
+  height: 7.5vh;
+  width: 15vw;
+  margin: 0;
+  background-color: rgb(9, 200, 195);
+  border-radius: 10px;
+  border: 0px;
+  color: #fefefe;
+  &:hover {
+    animation: ${fill} 1s linear;
+    background-color: #fefefe;
+    color: rgb(9, 200, 195);
+  }
+`;
+
 function MainHeader(props) {
+  const login = useContext(LoginContext);
+  const [modalShow, setModalShow] = React.useState(false);
+
   const settings = useContext(SettingsContext);
   const handleNumberChange = (e) => {
     settings.editShowNumber(parseInt(e.target.value));
@@ -46,11 +88,21 @@ function MainHeader(props) {
   const handleShowChange = (e) => {
     settings.editHideCompleted(e.target.checked);
   };
+  const authButton = !login.loggedIn ? (
+    <StyledButton variant="primary" onClick={() => setModalShow(true)}>
+      Login
+    </StyledButton>
+  ) : (
+    <StyledButton variant="primary" onClick={() => login.logout()}>
+      Logout
+    </StyledButton>
+  );
+
   return (
     <>
       <Navbar className={props.className}>
         <H3>ToDo App</H3>
-        <Nav>About us</Nav>
+        {authButton}
         <Nav>
           Number of Items
           <input
@@ -71,6 +123,7 @@ function MainHeader(props) {
           />
         </Nav>
       </Navbar>
+      <FormModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 }
