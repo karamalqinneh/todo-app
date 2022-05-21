@@ -61,9 +61,13 @@ const ToDo = () => {
     setList([...list, item]);
   }
   async function deleteItem(id) {
-    const items = list.filter((item) => item.id !== id);
-    let req = await superagent.put(`${API}/delete-todo/${id}`);
-    setList(items);
+    if (login.canDo("update")) {
+      const items = list.filter((item) => item.id !== id);
+      let req = await superagent.put(`${API}/delete-todo/${id}`);
+      setList(items);
+    } else {
+      console.log("Can't");
+    }
   }
 
   async function toggleComplete(id) {
@@ -85,7 +89,6 @@ const ToDo = () => {
   useEffect(() => {
     let incompleteCount = list.filter((item) => !item.complete).length;
     setIncomplete(incompleteCount);
-    document.title = `To Do List: ${incomplete}`;
   }, [list]);
   return (
     <Section>
