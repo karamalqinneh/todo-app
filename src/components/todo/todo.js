@@ -63,7 +63,7 @@ const ToDo = () => {
   async function deleteItem(id) {
     if (login.canDo("update")) {
       const items = list.filter((item) => item.id !== id);
-      let req = await superagent.put(`${API}/delete-todo/${id}`);
+      let req = await superagent.delete(`${API}/delete-todo/${id}`);
       setList(items);
     } else {
       console.log("Can't");
